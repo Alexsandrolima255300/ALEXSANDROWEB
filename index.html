@@ -29,6 +29,57 @@
 .fill{width:0!important;transition:width 1.25s cubic-bezier(.22,1,.36,1)}
 .skill.visible .fill{width:var(--skill-level)!important}
 
+
+/* === EFEITOS PREMIUM === */
+:root{--mx:50%;--my:50%}
+body{overflow-x:hidden}
+body::before{content:"";position:fixed;inset:-20%;pointer-events:none;z-index:-1;background:radial-gradient(circle at var(--mx) var(--my),rgba(0,240,255,.075),transparent 18%),radial-gradient(circle at 20% 20%,rgba(168,85,247,.055),transparent 22%);transition:background-position .15s ease}
+header{transition:transform .35s ease,background .35s ease,box-shadow .35s ease}
+header.nav-hidden{transform:translateY(-100%)}
+header.nav-scrolled{background:rgba(7,9,14,.96);box-shadow:0 10px 35px rgba(0,0,0,.35)}
+.hero h1{position:relative;text-shadow:0 0 0 transparent;animation:titleGlow 4s ease-in-out infinite}
+@keyframes titleGlow{50%{text-shadow:0 0 28px rgba(0,240,255,.10)}}
+.hero h1 span{display:inline-block;animation:nameFloat 3.5s ease-in-out infinite}
+@keyframes nameFloat{50%{transform:translateY(-3px)}}
+.eyebrow{position:relative}
+.eyebrow::after{content:"";display:inline-block;width:7px;height:14px;margin-left:7px;background:#10b981;vertical-align:-2px;animation:cursorBlink .8s step-end infinite}
+.terminal{position:relative}
+.terminal::before{content:"";position:absolute;inset:0;border-radius:12px;padding:1px;background:linear-gradient(120deg,transparent 25%,rgba(0,240,255,.8),transparent 55%);background-size:250% 250%;animation:borderSweep 5s linear infinite;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;pointer-events:none}
+@keyframes borderSweep{to{background-position:-250% 0}}
+.terminal::after{content:"";position:absolute;left:0;right:0;height:70px;top:70px;background:linear-gradient(transparent,rgba(0,240,255,.045),transparent);animation:scanline 3.8s linear infinite;pointer-events:none}
+@keyframes scanline{from{transform:translateY(-80px)}to{transform:translateY(360px)}}
+.termbody{position:relative}
+.termbody .cyan{animation:terminalFlicker 3s infinite}
+@keyframes terminalFlicker{0%,96%,100%{opacity:1}97%{opacity:.65}}
+.card{position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(0,240,255,.10),transparent 65%);transform:translateX(-120%);transition:transform .7s ease;pointer-events:none}
+.card:hover::before{transform:translateX(120%)}
+.card::after{content:"";position:absolute;width:80px;height:80px;right:-45px;top:-45px;border:1px solid rgba(0,240,255,.18);border-radius:50%;transition:transform .5s ease}
+.card:hover::after{transform:scale(2)}
+.skill{position:relative;overflow:hidden}
+.skill::after{content:"";position:absolute;left:-100%;top:0;width:35%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);animation:skillShine 3.5s ease-in-out infinite}
+@keyframes skillShine{0%,55%{left:-100%}100%{left:130%}}
+.fill{position:relative}
+.fill::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);animation:barShine 1.8s ease-in-out infinite}
+@keyframes barShine{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.timeline{position:relative}
+.job{position:relative;transition:transform .35s ease,opacity .5s ease}
+.job::before{content:"";position:absolute;left:-33px;top:5px;width:10px;height:10px;border-radius:50%;background:#10b981;box-shadow:0 0 0 4px #07090e,0 0 15px rgba(16,185,129,.8);animation:nodePulse 2s ease-in-out infinite}
+@keyframes nodePulse{50%{box-shadow:0 0 0 7px #07090e,0 0 25px rgba(16,185,129,.95)}}
+.job:hover{transform:translateX(7px)}
+.btn{position:relative;overflow:hidden;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+.btn::after{content:"";position:absolute;top:0;left:-120%;width:70%;height:100%;transform:skewX(-20deg);background:rgba(255,255,255,.16);transition:left .5s ease}
+.btn:hover{transform:translateY(-3px);box-shadow:0 10px 25px rgba(0,240,255,.12)}
+.btn:hover::after{left:140%}
+.github{transition:transform .25s ease,box-shadow .25s ease}
+.github:hover{transform:translateY(-2px);box-shadow:0 0 20px rgba(16,185,129,.2)}
+.contact{position:relative;transition:transform .35s ease,box-shadow .35s ease}
+.contact:hover{transform:translateY(-4px);box-shadow:0 20px 45px rgba(0,0,0,.35)}
+.cursor-trail{position:fixed;width:9px;height:9px;border:1px solid rgba(0,240,255,.8);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s,opacity .2s;mix-blend-mode:screen}
+.cursor-trail::after{content:"";position:absolute;inset:2px;border-radius:50%;background:#00f0ff;box-shadow:0 0 12px #00f0ff}
+@media (pointer:coarse){.cursor-trail{display:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+
 </style>
 </head>
 <body>
@@ -153,6 +204,51 @@
       line.style.transform = 'translateX(0)';
     }, 500 + i * 120);
   });
+})();
+</script>
+
+<script>
+(() => {
+  // Cursor neon que acompanha o mouse em desktops.
+  if (window.matchMedia('(pointer:fine)').matches) {
+    const trail=document.createElement('div'); trail.className='cursor-trail'; document.body.appendChild(trail);
+    let x=innerWidth/2,y=innerHeight/2,tx=x,ty=y;
+    addEventListener('mousemove',e=>{tx=e.clientX;ty=e.clientY;document.documentElement.style.setProperty('--mx',(e.clientX/innerWidth*100)+'%');document.documentElement.style.setProperty('--my',(e.clientY/innerHeight*100)+'%');});
+    const follow=()=>{x+=(tx-x)*.18;y+=(ty-y)*.18;trail.style.left=x+'px';trail.style.top=y+'px';requestAnimationFrame(follow)}; follow();
+    addEventListener('mousedown',()=>{trail.style.width='18px';trail.style.height='18px'});
+    addEventListener('mouseup',()=>{trail.style.width='9px';trail.style.height='9px'});
+  }
+
+  // Header entra/sai suavemente conforme a direção do scroll.
+  const header=document.querySelector('header'); let lastY=scrollY;
+  addEventListener('scroll',()=>{
+    const y=scrollY;
+    header.classList.toggle('nav-scrolled',y>50);
+    if(y>lastY && y>180) header.classList.add('nav-hidden');
+    else header.classList.remove('nav-hidden');
+    lastY=y;
+  },{passive:true});
+
+  // Efeito de números/linhas do terminal.
+  document.querySelectorAll('.termbody > div').forEach((line,i)=>{
+    line.dataset.index=String(i+1).padStart(2,'0');
+  });
+
+  // Parallax muito leve no terminal e no título.
+  const hero=document.querySelector('.hero');
+  const terminal=document.querySelector('.terminal');
+  addEventListener('mousemove',e=>{
+    if(!hero||!terminal||window.matchMedia('(pointer:coarse)').matches)return;
+    const rx=(e.clientY/innerHeight-.5)*-3;
+    const ry=(e.clientX/innerWidth-.5)*4;
+    terminal.style.transform='perspective(900px) rotateX('+rx+'deg) rotateY('+ry+'deg)';
+  });
+  if(terminal) terminal.addEventListener('mouseleave',()=>terminal.style.transform='');
+
+  // Animação dos cards com leve atraso ao entrar na tela.
+  const cards=[...document.querySelectorAll('.card')];
+  const cardObs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.style.transitionDelay=(cards.indexOf(e.target)*70)+'ms';e.target.classList.add('visible');cardObs.unobserve(e.target)}}),{threshold:.12});
+  cards.forEach(c=>cardObs.observe(c));
 })();
 </script>
 </body></html>

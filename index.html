@@ -127,7 +127,7 @@
   // Barras de habilidade animadas quando entram na tela.
   document.querySelectorAll('.skill').forEach(skill => {
     const fill = skill.querySelector('.fill');
-    if (fill) skill.style.setProperty('--skill-level', getComputedStyle(fill).width);
+    if (fill) const inlineWidth = (fill.getAttribute('style') || '').match(/width:\s*([^;]+)/i); if (inlineWidth) skill.style.setProperty('--skill-level', inlineWidth[1].trim());
   });
   const skillObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {

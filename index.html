@@ -80,6 +80,14 @@ header.nav-scrolled{background:rgba(7,9,14,.96);box-shadow:0 10px 35px rgba(0,0,
 @media (pointer:coarse){.cursor-trail{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
 
+
+/* === Aceternity-inspired encrypted text reveal (static HTML adaptation) === */
+.encrypted-name{display:inline-block;white-space:nowrap}
+.encrypted-name .encrypted-char{display:inline-block;min-width:.34em;color:#00f0ff;transition:color .18s ease,text-shadow .18s ease}
+.encrypted-name.is-revealing .encrypted-char{text-shadow:0 0 12px rgba(0,240,255,.42)}
+.encrypted-name.is-revealed .encrypted-char{color:#00f0ff;text-shadow:0 0 18px rgba(0,240,255,.18)}
+@media(prefers-reduced-motion:reduce){.encrypted-name .encrypted-char{transition:none}}
+
 </style>
 </head>
 <body>
@@ -250,4 +258,70 @@ header.nav-scrolled{background:rgba(7,9,14,.96);box-shadow:0 10px 35px rgba(0,0,
   cards.forEach(c=>cardObs.observe(c));
 })();
 </script>
+
+<script>
+(() => {
+  const target = document.querySelector('.hero h1 span');
+  if (!target) return;
+  const original = target.textContent.trim();
+  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*+-=?';
+  const delay = 50;
+  let started = false;
+  target.classList.add('encrypted-name');
+  target.setAttribute('aria-label', original);
+  target.setAttribute('role', 'text');
+  target.setAttribute('aria-live', 'off');
+
+  const reveal = () => {
+    if (started) return;
+    started = true;
+    target.classList.add('is-revealing');
+    const chars = Array.from(original);
+    target.innerHTML = chars.map((char, index) =>
+      char === ' '
+        ? '<span class="encrypted-char" aria-hidden="true">&nbsp;</span>'
+        : '<span class="encrypted-char" aria-hidden="true">' + charset[Math.floor(Math.random() * charset.length)] + '</span>'
+    ).join('');
+    const nodes = Array.from(target.querySelectorAll('.encrypted-char'));
+    let revealed = 0;
+    const scramble = window.setInterval(() => {
+      nodes.forEach((node, index) => {
+        if (index >= revealed && chars[index] !== ' ') {
+          node.textContent = charset[Math.floor(Math.random() * charset.length)];
+        }
+      });
+    }, 55);
+    const revealNext = () => {
+      if (revealed >= chars.length) {
+        clearInterval(scramble);
+        target.classList.remove('is-revealing');
+        target.classList.add('is-revealed');
+        return;
+      }
+      nodes[revealed].textContent = chars[revealed] === ' ' ? '\u00a0' : chars[revealed];
+      revealed++;
+      window.setTimeout(revealNext, delay);
+    };
+    revealNext();
+  };
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    target.textContent = original;
+    target.classList.add('is-revealed');
+    return;
+  }
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) {
+        reveal();
+        observer.disconnect();
+      }
+    }, { threshold: 0.25 });
+    observer.observe(target);
+  } else {
+    reveal();
+  }
+})();
+</script>
+
 </body></html>
